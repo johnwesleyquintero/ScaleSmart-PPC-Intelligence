@@ -76,7 +76,7 @@ export default function CompetitorAnalyzer({ competitors }: CompetitorAnalyzerPr
         <div className="bg-white border border-slate-200 p-6 rounded-xl space-y-4 shadow-sm">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">Tracked Competitive Listings</h3>
           <div className="space-y-3">
-            {Buffer.from && competitors.map((comp) => {
+            {competitors && competitors.map((comp) => {
               const priceGap = myPrice - comp.price;
               const isDanger = comp.price < myPrice - 4.5 && comp.rating >= 4.3;
 

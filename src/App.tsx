@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   LayoutDashboard,
   Database,
@@ -422,78 +423,89 @@ export default function App() {
         <div className="flex-1 overflow-y-auto p-8 grid grid-cols-1 xl:grid-cols-4 gap-6 items-start">
           
           {/* Main workspace widgets segment */}
-          <div className="xl:col-span-3 space-y-6">
-            {activeTab === "executive" && (
-              <ExecutiveDashboard
-                campaigns={normalizedData.campaigns}
-                business={normalizedData.business}
-              />
-            )}
+          <div className="xl:col-span-3">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.15, ease: "easeInOut" }}
+                className="space-y-6"
+              >
+                {activeTab === "executive" && (
+                  <ExecutiveDashboard
+                    campaigns={normalizedData.campaigns}
+                    business={normalizedData.business}
+                  />
+                )}
 
-            {activeTab === "etl" && (
-              <EtlConsole
-                rawCampaigns={rawCampaigns}
-                rawSearchTerms={rawSearchTerms}
-                rawBusiness={rawBusiness}
-                rawKeywords={rawKeywords}
-                rawCompetitors={rawCompetitors}
-                onTriggerEtl={handleTriggerEtl}
-                onResetToDefaults={handleResetToDefaults}
-              />
-            )}
+                {activeTab === "etl" && (
+                  <EtlConsole
+                    rawCampaigns={rawCampaigns}
+                    rawSearchTerms={rawSearchTerms}
+                    rawBusiness={rawBusiness}
+                    rawKeywords={rawKeywords}
+                    rawCompetitors={rawCompetitors}
+                    onTriggerEtl={handleTriggerEtl}
+                    onResetToDefaults={handleResetToDefaults}
+                  />
+                )}
 
-            {activeTab === "sheets" && (
-              <GoogleSheetsPanel
-                currentData={{
-                  campaigns: rawCampaigns,
-                  searchTerms: rawSearchTerms,
-                  business: rawBusiness,
-                  keywords: rawKeywords,
-                  competitors: rawCompetitors
-                }}
-                onImportData={(imported) => {
-                  if (imported.campaigns && imported.campaigns.length > 0) setRawCampaigns(imported.campaigns);
-                  if (imported.searchTerms && imported.searchTerms.length > 0) setRawSearchTerms(imported.searchTerms);
-                  if (imported.business && imported.business.length > 0) setRawBusiness(imported.business);
-                  if (imported.keywords && imported.keywords.length > 0) setRawKeywords(imported.keywords);
-                  if (imported.competitors && imported.competitors.length > 0) setRawCompetitors(imported.competitors);
-                }}
-                user={user}
-                setUser={setUser}
-                token={token}
-                setToken={setToken}
-                authLoading={authLoading}
-                setAuthLoading={setAuthLoading}
-                onLogin={handleLogin}
-                onLogout={handleLogout}
-                authError={authError}
-                setAuthError={setAuthError}
-              />
-            )}
+                {activeTab === "sheets" && (
+                  <GoogleSheetsPanel
+                    currentData={{
+                      campaigns: rawCampaigns,
+                      searchTerms: rawSearchTerms,
+                      business: rawBusiness,
+                      keywords: rawKeywords,
+                      competitors: rawCompetitors
+                    }}
+                    onImportData={(imported) => {
+                      if (imported.campaigns && imported.campaigns.length > 0) setRawCampaigns(imported.campaigns);
+                      if (imported.searchTerms && imported.searchTerms.length > 0) setRawSearchTerms(imported.searchTerms);
+                      if (imported.business && imported.business.length > 0) setRawBusiness(imported.business);
+                      if (imported.keywords && imported.keywords.length > 0) setRawKeywords(imported.keywords);
+                      if (imported.competitors && imported.competitors.length > 0) setRawCompetitors(imported.competitors);
+                    }}
+                    user={user}
+                    setUser={setUser}
+                    token={token}
+                    setToken={setToken}
+                    authLoading={authLoading}
+                    setAuthLoading={setAuthLoading}
+                    onLogin={handleLogin}
+                    onLogout={handleLogout}
+                    authError={authError}
+                    setAuthError={setAuthError}
+                  />
+                )}
 
-            {activeTab === "campaigns" && (
-              <CampaignOptimizer
-                campaigns={normalizedData.campaigns}
-                onTriggerAudit={handleTriggerAudit}
-              />
-            )}
+                {activeTab === "campaigns" && (
+                  <CampaignOptimizer
+                    campaigns={normalizedData.campaigns}
+                    onTriggerAudit={handleTriggerAudit}
+                  />
+                )}
 
-            {activeTab === "keywords" && (
-              <KeywordTracker keywords={normalizedData.keywords} />
-            )}
+                {activeTab === "keywords" && (
+                  <KeywordTracker keywords={normalizedData.keywords} />
+                )}
 
-            {activeTab === "searchTerms" && (
-              <SearchTermConsole
-                searchTerms={normalizedData.searchTerms}
-                onPromoteKeyword={handlePromoteKeyword}
-                onNegateTerm={handleNegateTerm}
-                onTestTerm={handleTestTerm}
-              />
-            )}
+                {activeTab === "searchTerms" && (
+                  <SearchTermConsole
+                    searchTerms={normalizedData.searchTerms}
+                    onPromoteKeyword={handlePromoteKeyword}
+                    onNegateTerm={handleNegateTerm}
+                    onTestTerm={handleTestTerm}
+                  />
+                )}
 
-            {activeTab === "competitors" && (
-              <CompetitorAnalyzer competitors={normalizedData.competitors} />
-            )}
+                {activeTab === "competitors" && (
+                  <CompetitorAnalyzer competitors={normalizedData.competitors} />
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Right sidebar for alerts matching theme layout */}
