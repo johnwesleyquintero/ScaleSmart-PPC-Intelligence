@@ -1,0 +1,8 @@
+{
+  "name": "ScaleSmart PPC Intelligence",
+  "description": "A lightweight Amazon PPC Intelligence Platform that connects Advertising Console, Business Reports, Helium 10, and Brand Analytics to diagnose root-causes of campaign performance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
