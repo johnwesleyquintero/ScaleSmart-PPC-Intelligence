@@ -50,6 +50,7 @@ export default function App() {
   const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // Sync auth state
   useEffect(() => {
@@ -58,6 +59,7 @@ export default function App() {
         setUser(currentUser);
         setToken(currentToken);
         setAuthLoading(false);
+        setAuthError(null);
       },
       () => {
         setUser(null);
@@ -71,13 +73,19 @@ export default function App() {
   const handleLogin = async () => {
     try {
       setAuthLoading(true);
+      setAuthError(null);
       const result = await googleSignIn();
       if (result) {
         setUser(result.user);
         setToken(result.accessToken);
       }
-    } catch (err) {
-      console.error("Login error under App.tsx dashboard", err);
+    } catch (err: any) {
+      console.error("Login error under App.tsx dashboard:", err);
+      let errMsg = err.message || String(err);
+      if (errMsg.includes("auth/unauthorized-domain") || (err.code && err.code === "auth/unauthorized-domain")) {
+        errMsg = `Unauthorized Domain: The domain (${window.location.host}) is not registered in your Firebase settings. Add this domain to your Authorized Domains list in the Firebase Console (Authentication ➔ Settings ➔ Authorized Domains) and try again.`;
+      }
+      setAuthError(errMsg);
     } finally {
       setAuthLoading(false);
     }
@@ -88,6 +96,7 @@ export default function App() {
       await logout();
       setUser(null);
       setToken(null);
+      setAuthError(null);
     } catch (err) {
       console.error("Logout error under App.tsx dashboard", err);
     }
@@ -457,6 +466,8 @@ export default function App() {
                 setAuthLoading={setAuthLoading}
                 onLogin={handleLogin}
                 onLogout={handleLogout}
+                authError={authError}
+                setAuthError={setAuthError}
               />
             )}
 

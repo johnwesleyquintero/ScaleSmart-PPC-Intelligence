@@ -36,6 +36,8 @@ interface GoogleSheetsPanelProps {
   setAuthLoading: React.Dispatch<React.SetStateAction<boolean>>;
   onLogin: () => Promise<void>;
   onLogout: () => Promise<void>;
+  authError: string | null;
+  setAuthError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export default function GoogleSheetsPanel({
@@ -49,6 +51,8 @@ export default function GoogleSheetsPanel({
   setAuthLoading,
   onLogin,
   onLogout,
+  authError,
+  setAuthError,
 }: GoogleSheetsPanelProps) {
   // Sync / Action state
   const [creatingTemplate, setCreatingTemplate] = useState(false);
@@ -238,6 +242,19 @@ export default function GoogleSheetsPanel({
               Once you enable Google representation, you can export ScaleSmart report sheets directly to Google Sheets securely, and import them in one click to compile statistics downstream.
             </p>
           </div>
+
+          {authError && (
+            <div className="flex items-start gap-3 bg-rose-50 border border-rose-150 p-4 rounded-lg text-left text-xs max-w-md mt-2 shadow-xs animate-fade-in">
+              <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-rose-600" />
+              <div className="space-y-1">
+                <p className="font-bold text-rose-800 font-sans">Authentication Troubleshooting Guide</p>
+                <p className="font-sans leading-relaxed text-rose-750 text-rose-700">{authError}</p>
+                <div className="bg-white border border-rose-150 p-2 rounded text-[10px] font-mono mt-2 break-all text-slate-600">
+                  {window.location.origin}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Official Google Sign In Button Spec */}
           <button onClick={handleLogin} className="gsi-material-button font-bold text-xs" style={{ cursor: "pointer" }}>

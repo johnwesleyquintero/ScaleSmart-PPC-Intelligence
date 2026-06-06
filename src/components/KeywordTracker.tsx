@@ -148,7 +148,7 @@ export default function KeywordTracker({ keywords }: KeywordTrackerProps) {
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
         <h3 className="text-sm font-bold text-slate-800 font-sans">Visual Placement Map (Higher is closer to Rank #1)</h3>
         <div className="w-full h-64 font-sans">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minHeight={256}>
             <BarChart data={chartFormatData}>
               <XAxis dataKey="name" stroke="#94a3b8" style={{ fontSize: 10, fontFamily: "sans-serif" }} />
               <YAxis stroke="#94a3b8" domain={[0, 35]} style={{ fontSize: 10 }} label={{ value: 'Rank Strength Map', angle: -90, position: 'insideLeft', style: { fill: '#94a3b8', fontSize: 10, fontFamily: "sans-serif" } }} />

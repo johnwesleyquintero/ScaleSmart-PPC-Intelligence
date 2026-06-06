@@ -201,7 +201,7 @@ export default function ExecutiveDashboard({ campaigns, business }: ExecutiveDas
           </div>
 
           <div className="w-full h-72">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minHeight={288}>
               <AreaChart data={absoluteChartData}>
                 <defs>
                   <linearGradient id="colorOrg" x1="0" y1="0" x2="0" y2="1">
