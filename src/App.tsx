@@ -20,7 +20,9 @@ import {
   Compass,
   Trophy,
   ArrowRight,
-  TrendingDown
+  TrendingDown,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 // Types
@@ -104,6 +106,25 @@ export default function App() {
   };
   // Navigation
   const [activeTab, setActiveTab] = useState<"executive" | "etl" | "sheets" | "campaigns" | "keywords" | "searchTerms" | "competitors">("executive");
+
+  // Collapsible Sidebar State
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("scale_smart_sidebar_collapsed");
+      return saved === "true";
+    }
+    return false;
+  });
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("scale_smart_sidebar_collapsed", String(next));
+      }
+      return next;
+    });
+  };
 
   // Raw Database Layers
   const [rawCampaigns, setRawCampaigns] = useState<Array<any>>(initialRawCampaigns);
@@ -255,106 +276,127 @@ export default function App() {
     <div className="min-h-screen bg-[#F8FAFC] flex font-sans text-slate-900 overflow-hidden antialiased">
       
       {/* Sidebar Navigation */}
-      <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col justify-between border-r border-slate-800 shrink-0 select-none">
+      <aside className={`bg-[#0F172A] text-slate-300 flex flex-col justify-between border-r border-[#1E293B] shrink-0 select-none transition-all duration-300 ease-in-out relative ${isSidebarCollapsed ? "w-16" : "w-64"}`}>
         <div>
-          <div className="p-6 border-b border-slate-800">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center text-white font-bold font-sans shadow-md shadow-indigo-500/20">S</div>
-              <div>
-                <h1 className="text-base font-bold tracking-tight text-white leading-tight">ScaleSmart</h1>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest leading-none mt-0.5">PPC Intelligence v1.0.0</p>
+          <div className="p-4 border-b border-slate-800 flex items-center justify-between min-h-[64px]">
+            <div className={`flex items-center ${isSidebarCollapsed ? "justify-center w-full" : "gap-2.5"}`}>
+              <div className="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center text-white font-bold font-sans shadow-md shadow-indigo-500/20 shrink-0 select-none">
+                S
               </div>
+              {!isSidebarCollapsed && (
+                <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="truncate">
+                  <h1 className="text-sm font-bold tracking-tight text-white leading-tight">ScaleSmart</h1>
+                  <p className="text-[9px] text-slate-500 uppercase tracking-widest leading-none mt-0.5">PPC Intel v1.0.0</p>
+                </motion.div>
+              )}
             </div>
+            {!isSidebarCollapsed && (
+              <button
+                onClick={toggleSidebar}
+                className="p-1 rounded bg-slate-800/40 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                title="Collapse Sidebar"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            )}
           </div>
+
+          {isSidebarCollapsed && (
+            <div className="flex justify-center py-2 border-b border-slate-800/60">
+              <button
+                onClick={toggleSidebar}
+                className="p-1.5 rounded-lg bg-slate-800/40 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                title="Expand Sidebar"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
           
-          <nav className="p-4 space-y-1">
-            <button
-              onClick={() => setActiveTab("executive")}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-left ${
-                activeTab === "executive"
-                  ? "bg-indigo-600/15 text-indigo-400 border-l-4 border-indigo-500"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-              }`}
-            >
-              📊 Executive Dashboard
-            </button>
-
-            <button
-              onClick={() => setActiveTab("etl")}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-left ${
-                activeTab === "etl"
-                  ? "bg-indigo-600/15 text-indigo-400 border-l-4 border-indigo-500"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-              }`}
-            >
-              🔄 ETL Warehouse
-            </button>
-
-            <button
-              onClick={() => setActiveTab("sheets")}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-left ${
-                activeTab === "sheets"
-                  ? "bg-emerald-600/15 text-emerald-400 border-l-4 border-emerald-500"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-805 hover:bg-slate-800"
-              }`}
-            >
-              🟢 Google Sheets Sync
-            </button>
-
-            <button
-              onClick={() => setActiveTab("campaigns")}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-left ${
-                activeTab === "campaigns"
-                  ? "bg-indigo-600/15 text-indigo-400 border-l-4 border-indigo-500"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-              }`}
-            >
-              🎯 Campaign Optimizer
-            </button>
-
-            <button
-              onClick={() => setActiveTab("keywords")}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-left ${
-                activeTab === "keywords"
-                  ? "bg-indigo-600/15 text-indigo-400 border-l-4 border-indigo-500"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-              }`}
-            >
-              🔑 Keyword Rank Tracker
-            </button>
-
-            <button
-              onClick={() => setActiveTab("searchTerms")}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-left ${
-                activeTab === "searchTerms"
-                  ? "bg-indigo-600/15 text-indigo-400 border-l-4 border-indigo-500"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-              }`}
-            >
-              🧩 Search Term Dispatch
-            </button>
-
-            <button
-              onClick={() => setActiveTab("competitors")}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-left ${
-                activeTab === "competitors"
-                  ? "bg-indigo-600/15 text-indigo-400 border-l-4 border-indigo-500"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-              }`}
-            >
-              🛡️ Competitor Outrank
-            </button>
+          <nav className="p-3 space-y-1.5">
+            {[
+              { id: "executive", label: "Executive Dashboard", icon: "📊", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" },
+              { id: "etl", label: "ETL Warehouse", icon: "🔄", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" },
+              { id: "sheets", label: "Google Sheets Sync", icon: "🟢", border: "border-emerald-500", bgActive: "bg-emerald-600/15 text-emerald-400" },
+              { id: "campaigns", label: "Campaign Optimizer", icon: "🎯", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" },
+              { id: "keywords", label: "Keyword Rank Tracker", icon: "🔑", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" },
+              { id: "searchTerms", label: "Search Term Dispatch", icon: "🧩", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" },
+              { id: "competitors", label: "Competitor Outrank", icon: "🛡️", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" }
+            ].map((tabItem) => {
+              const isActive = activeTab === tabItem.id;
+              return (
+                <button
+                  key={tabItem.id}
+                  onClick={() => setActiveTab(tabItem.id as any)}
+                  className={`group relative w-full flex items-center rounded-lg text-xs md:text-sm font-semibold transition-all cursor-pointer ${
+                    isSidebarCollapsed ? "justify-center p-2.5" : "px-3 py-2.5 gap-3 text-left"
+                  } ${
+                    isActive
+                      ? `${tabItem.bgActive} border-l-4 ${tabItem.border}`
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  }`}
+                  title={isSidebarCollapsed ? undefined : tabItem.label}
+                >
+                  <span className="shrink-0 text-base">{tabItem.icon}</span>
+                  {!isSidebarCollapsed && <span className="truncate">{tabItem.label}</span>}
+                  
+                  {/* Collapsed Hover Tooltip */}
+                  {isSidebarCollapsed && (
+                    <div className="absolute left-14 ml-2 px-2.5 py-1.5 bg-slate-950 border border-slate-800 text-white text-xs font-semibold rounded-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-[100] whitespace-nowrap shadow-xl">
+                      {tabItem.label}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </nav>
         </div>
 
-        <div className="p-4 space-y-4 border-t border-slate-800">
-          <div className="bg-slate-800/50 p-3 rounded-lg text-xs space-y-1">
-            <div className="text-slate-500 font-medium">Active ASIN Item</div>
-            <div className="text-white font-mono font-bold leading-none">B0GXWB95V9</div>
-            <div className="text-slate-400 text-[10px] font-mono leading-none">SIGN12X8-WOOD</div>
-          </div>
-          <div className="text-center text-[10px] text-slate-400 font-mono tracking-wider truncate px-1" title={user ? user.email : "John Wesley Quintero"}>
-            {user ? (user.displayName || user.email) : "John Wesley Quintero"}
+        <div className="p-3 space-y-3 border-t border-slate-800">
+          {!isSidebarCollapsed && (
+            <div className="bg-slate-800/30 p-3 rounded-lg text-xs space-y-1">
+              <div className="text-slate-500 font-medium">Active ASIN Item</div>
+              <div className="text-white font-mono font-bold leading-none">B0GXWB95V9</div>
+              <div className="text-slate-400 text-[10px] font-mono leading-none">SIGN12X8-WOOD</div>
+            </div>
+          )}
+
+          <div className={`p-1 flex ${isSidebarCollapsed ? "justify-center" : "items-center gap-2.5"}`}>
+            {user ? (
+              user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName || "Google avatar"}
+                  referrerPolicy="no-referrer"
+                  className="w-8 h-8 rounded-full border border-indigo-500/30 shadow-sm shrink-0 animate-fade-in"
+                  title={user.email}
+                />
+              ) : (
+                <div 
+                  className="w-8 h-8 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center font-bold text-xs text-indigo-400 shadow-xs shrink-0"
+                  title={user.email}
+                >
+                  {user.displayName ? user.displayName.slice(0, 2).toUpperCase() : (user.email ? user.email.slice(0, 2).toUpperCase() : "US")}
+                </div>
+              )
+            ) : (
+              <div 
+                className="w-8 h-8 rounded-full bg-slate-700/50 border border-slate-600/30 flex items-center justify-center font-semibold text-xs text-slate-400 shrink-0 select-none"
+                title="John Wesley Quintero (Demo Mode)"
+              >
+                JW
+              </div>
+            )}
+            {!isSidebarCollapsed && (
+              <div className="min-w-0 flex-1 select-none">
+                <p className="text-xs font-bold text-white truncate leading-tight">
+                  {user ? (user.displayName || "Authorized User") : "John Wesley"}
+                </p>
+                <p className="text-[10px] text-slate-500 truncate leading-tight mt-0.5" title={user ? user.email : "wesley.ecomva@gmail.com"}>
+                  {user ? user.email : "wesley.ecomva@gmail.com"}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </aside>
