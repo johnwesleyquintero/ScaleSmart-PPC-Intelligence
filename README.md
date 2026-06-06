@@ -109,3 +109,28 @@ The Sync Ingestion engine enforces a strict format consisting of **5 designated 
 ScaleSmart relies on secure **Firebase Auth via popup Google integration**. 
 - Your personal and Google Drive files are completely safe; ScaleSmart only gains permissions to view and edit spreadsheets **specifically created by the application** or **explicitly requested** during import.
 - Server-side API layers are proxy-shielded, ensuring Gemini API keys and private authentication secrets are never exposed on client browsers.
+
+---
+
+## Firebase Authorized Domains Configuration 🌐
+
+When deploying this application to production or accessing it from custom hosts, you **must authorize your deployment domain** in Firebase to allow Google OAuth and Firebase Authentication popup operations.
+
+### Setup Steps:
+
+1. **Access Firebase Console**:
+   Navigate to the [Firebase Console](https://console.firebase.google.com/) and select your active project.
+
+2. **Navigate to Authentication Settings**:
+   - In the left sidebar navigation, expand **Build** and choose **Authentication**.
+   - Click on the **Settings** tab located near the top of the interface.
+
+3. **Locate Authorized Domains**:
+   - In the settings side menu, select **Authorized domains**.
+
+4. **Add Your Domain**:
+   - Click the **Add domain** button.
+   - Enter your specific deployment host exactly: `scale-smart-ppc.vercel.app` (or your specific deployment domain).
+   - Click **Add**.
+
+> 💡 *Note: While local development hosts (like `localhost` or local IPs) are typically pre-authorized, any staging, production, or serverless deployment domain requires explicit authorization in the Firebase Console to avoid authentication origin errors (e.g., `auth/unauthorized-domain`).*
