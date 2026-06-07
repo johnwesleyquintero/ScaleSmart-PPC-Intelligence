@@ -46,6 +46,7 @@ import KeywordTracker from "./components/KeywordTracker";
 import SearchTermConsole from "./components/SearchTermConsole";
 import CompetitorAnalyzer from "./components/CompetitorAnalyzer";
 import GoogleSheetsPanel from "./components/GoogleSheetsPanel";
+import ForensicCopilotChat from "./components/ForensicCopilotChat";
 import { initAuth, googleSignIn, logout } from "./lib/firebaseAuth";
 
 export default function App() {
@@ -105,7 +106,7 @@ export default function App() {
     }
   };
   // Navigation
-  const [activeTab, setActiveTab] = useState<"executive" | "etl" | "sheets" | "campaigns" | "keywords" | "searchTerms" | "competitors">("executive");
+  const [activeTab, setActiveTab] = useState<"executive" | "etl" | "sheets" | "campaigns" | "keywords" | "searchTerms" | "competitors" | "copilot">("executive");
 
   // Collapsible Sidebar State
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
@@ -227,6 +228,30 @@ export default function App() {
     setRawCampaigns(updatedCampaigns);
   };
 
+  // Tactical Sandbox Action: Adjust target campaign bids/budgets dynamically
+  const handleAdjustCampaignBid = (campaignId: string, nextBid: number, nextBudget: number) => {
+    const updatedCampaigns = rawCampaigns.map((c) => {
+      if (c.campaignId === campaignId) {
+        // Safe baselines check
+        const currentCampaignBudget = c.dailyBudget || 100;
+        const currentBid = c.targetBid || 1.45;
+        const budgetRatio = nextBudget / currentCampaignBudget;
+        const bidRatio = nextBid / currentBid;
+        return {
+          ...c,
+          dailyBudget: nextBudget,
+          targetBid: nextBid,
+          spend: Number(Math.max(5, c.spend * budgetRatio * bidRatio).toFixed(2)),
+          sales: Number(Math.max(0, c.sales * budgetRatio * bidRatio).toFixed(2)),
+          clicks: Math.max(1, Math.round(c.clicks * budgetRatio)),
+          orders: Math.max(0, Math.round(c.orders * budgetRatio)),
+        };
+      }
+      return c;
+    });
+    setRawCampaigns(updatedCampaigns);
+  };
+
   // Tactical Sandbox Action: Test term in sandbox target group
   const handleTestTerm = (st: SearchTermReport) => {
     // Set low-level bidding sandbox testing metrics
@@ -316,6 +341,7 @@ export default function App() {
           <nav className="p-3 space-y-1.5">
             {[
               { id: "executive", label: "Executive Dashboard", icon: "📊", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" },
+              { id: "copilot", label: "AI Forensic Co-Pilot", icon: "✨", border: "border-purple-500", bgActive: "bg-purple-600/15 text-purple-400" },
               { id: "etl", label: "ETL Warehouse", icon: "🔄", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" },
               { id: "sheets", label: "Google Sheets Sync", icon: "🟢", border: "border-emerald-500", bgActive: "bg-emerald-600/15 text-emerald-400" },
               { id: "campaigns", label: "Campaign Optimizer", icon: "🎯", border: "border-indigo-500", bgActive: "bg-indigo-600/15 text-indigo-400" },
@@ -523,10 +549,37 @@ export default function App() {
                   />
                 )}
 
+                {activeTab === "copilot" && (
+                  <ForensicCopilotChat
+                    context={{
+                      campaigns: rawCampaigns,
+                      searchTerms: rawSearchTerms,
+                      keywords: rawKeywords,
+                      competitors: rawCompetitors,
+                      business: rawBusiness
+                    }}
+                  />
+                )}
+
                 {activeTab === "campaigns" && (
                   <CampaignOptimizer
                     campaigns={normalizedData.campaigns}
                     onTriggerAudit={handleTriggerAudit}
+                    onAdjustCampaignBid={handleAdjustCampaignBid}
+                    onPromoteTarget={(searchTerm) => {
+                      handlePromoteKeyword({
+                        searchTerm,
+                        asin: "B0GXWB95V9",
+                        sku: "SIGN12X8",
+                        spend: 0,
+                        clicks: 0,
+                        orders: 1,
+                        sales: 29.99
+                      } as any);
+                    }}
+                    onNegateTerm={(stName) => {
+                      handleNegateTerm({ searchTerm: stName, spend: 14.40, clicks: 8, orders: 0, sales: 0 } as any);
+                    }}
                   />
                 )}
 
